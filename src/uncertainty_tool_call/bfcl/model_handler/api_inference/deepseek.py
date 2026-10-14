@@ -2,9 +2,9 @@ import json
 import os
 import time
 
-from bfcl.model_handler.api_inference.openai import OpenAIHandler
-from bfcl.model_handler.model_style import ModelStyle
-from bfcl.model_handler.utils import (
+from uncertainty_tool_call.bfcl.model_handler.api_inference.openai import OpenAIHandler
+from uncertainty_tool_call.bfcl.model_handler.model_style import ModelStyle
+from uncertainty_tool_call.bfcl.model_handler.utils import (
     combine_consecutive_user_prompts,
     func_doc_language_specific_pre_processing,
     retry_with_backoff,

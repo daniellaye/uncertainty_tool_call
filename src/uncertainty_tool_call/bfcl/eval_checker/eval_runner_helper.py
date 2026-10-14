@@ -5,12 +5,12 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from bfcl._apply_function_credential_config import apply_function_credential_config
-from bfcl.constant import PROMPT_PATH, TEST_FILE_MAPPING
-from bfcl.eval_checker.constant import *
-from bfcl.eval_checker.executable_eval.custom_exception import BadAPIStatusError
-from bfcl.eval_checker.model_metadata import *
-from bfcl.utils import (
+from uncertainty_tool_call.bfcl._apply_function_credential_config import apply_function_credential_config
+from uncertainty_tool_call.bfcl.constant import PROMPT_PATH, TEST_FILE_MAPPING
+from uncertainty_tool_call.bfcl.eval_checker.constant import *
+from uncertainty_tool_call.bfcl.eval_checker.executable_eval.custom_exception import BadAPIStatusError
+from uncertainty_tool_call.bfcl.eval_checker.model_metadata import *
+from uncertainty_tool_call.bfcl.utils import (
     extract_test_category,
     find_file_with_suffix,
     load_file,
@@ -22,7 +22,7 @@ from tqdm import tqdm
 def api_status_sanity_check_rest():
 
     # We only need to import the executable_checker_rest in this function. So a local import is used.
-    from bfcl.eval_checker.executable_eval.executable_checker import (
+    from uncertainty_tool_call.bfcl.eval_checker.executable_eval.executable_checker import (
         executable_checker_rest,
     )
 
@@ -55,7 +55,7 @@ def api_status_sanity_check_rest():
 
 
 def api_status_sanity_check_executable():
-    from bfcl.eval_checker.executable_eval.executable_checker import (
+    from uncertainty_tool_call.bfcl.eval_checker.executable_eval.executable_checker import (
         executable_checker_simple,
     )
 
@@ -122,7 +122,7 @@ def get_executable_expected_output(prompt_file_path):
         ground_truth = item["ground_truth"]
         for i in range(len(ground_truth)):
             exec(
-                "from bfcl.eval_checker.executable_eval.data.executable_python_function import *"
+                "from uncertainty_tool_call.bfcl.eval_checker.executable_eval.data.executable_python_function import *"
                 + "\nresult="
                 + ground_truth[i],
                 exec_dict,

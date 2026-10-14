@@ -4,16 +4,16 @@ from types import SimpleNamespace
 from typing import List
 
 import typer
-from bfcl._llm_response_generation import main as generation_main
-from bfcl.constant import (
+from uncertainty_tool_call.bfcl._llm_response_generation import main as generation_main
+from uncertainty_tool_call.bfcl.constant import (
     DOTENV_PATH,
     PROJECT_ROOT,
     RESULT_PATH,
     SCORE_PATH,
     TEST_COLLECTION_MAPPING,
 )
-from bfcl.eval_checker.eval_runner import main as evaluation_main
-from bfcl.model_handler.handler_map import HANDLER_MAP
+from uncertainty_tool_call.bfcl.eval_checker.eval_runner import main as evaluation_main
+from uncertainty_tool_call.bfcl.model_handler.handler_map import HANDLER_MAP
 from dotenv import load_dotenv
 from tabulate import tabulate
 

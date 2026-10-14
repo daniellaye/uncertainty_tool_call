@@ -2,19 +2,19 @@ import json
 import time
 from copy import deepcopy
 
-from bfcl.constant import RESULT_PATH, VERSION_PREFIX
-from bfcl.eval_checker.multi_turn_eval.multi_turn_utils import (
+from uncertainty_tool_call.bfcl.constant import RESULT_PATH, VERSION_PREFIX
+from uncertainty_tool_call.bfcl.eval_checker.multi_turn_eval.multi_turn_utils import (
     STATELESS_CLASSES,
     execute_multi_turn_func_call,
     is_empty_execute_response,
 )
-from bfcl.model_handler.constant import (
+from uncertainty_tool_call.bfcl.model_handler.constant import (
     DEFAULT_USER_PROMPT_FOR_ADDITIONAL_FUNCTION_FC,
     DEFAULT_USER_PROMPT_FOR_ADDITIONAL_FUNCTION_PROMPTING,
     MAXIMUM_STEP_LIMIT,
 )
-from bfcl.model_handler.model_style import ModelStyle
-from bfcl.utils import load_file, make_json_serializable, sort_key
+from uncertainty_tool_call.bfcl.model_handler.model_style import ModelStyle
+from uncertainty_tool_call.bfcl.utils import load_file, make_json_serializable, sort_key
 from overrides import final
 
 

@@ -1,6 +1,6 @@
 import os
 
-from bfcl.model_handler.api_inference.openai import OpenAIHandler
+from uncertainty_tool_call.bfcl.model_handler.api_inference.openai import OpenAIHandler
 from openai import OpenAI
 
 

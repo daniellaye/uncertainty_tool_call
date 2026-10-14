@@ -1,10 +1,10 @@
-from bfcl.model_handler.constant import (
+from uncertainty_tool_call.bfcl.model_handler.constant import (
     UNDERSCORE_TO_DOT,
     JAVA_TYPE_CONVERSION,
     JS_TYPE_CONVERSION,
 )
-from bfcl.eval_checker.ast_eval.type_convertor.java_type_converter import java_type_converter
-from bfcl.eval_checker.ast_eval.type_convertor.js_type_converter import js_type_converter
+from uncertainty_tool_call.bfcl.eval_checker.ast_eval.type_convertor.java_type_converter import java_type_converter
+from uncertainty_tool_call.bfcl.eval_checker.ast_eval.type_convertor.js_type_converter import js_type_converter
 import re
 
 #### Constants ####

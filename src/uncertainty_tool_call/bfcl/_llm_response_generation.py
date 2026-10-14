@@ -5,8 +5,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 
-from bfcl._apply_function_credential_config import apply_function_credential_config
-from bfcl.constant import (
+from uncertainty_tool_call.bfcl._apply_function_credential_config import apply_function_credential_config
+from uncertainty_tool_call.bfcl.constant import (
     MULTI_TURN_FUNC_DOC_FILE_MAPPING,
     MULTI_TURN_FUNC_DOC_PATH,
     PROJECT_ROOT,
@@ -15,10 +15,10 @@ from bfcl.constant import (
     TEST_FILE_MAPPING,
     TEST_IDS_TO_GENERATE_PATH,
 )
-from bfcl.eval_checker.eval_runner_helper import load_file
-from bfcl.model_handler.handler_map import HANDLER_MAP
-from bfcl.model_handler.model_style import ModelStyle
-from bfcl.utils import (
+from uncertainty_tool_call.bfcl.eval_checker.eval_runner_helper import load_file
+from uncertainty_tool_call.bfcl.model_handler.handler_map import HANDLER_MAP
+from uncertainty_tool_call.bfcl.model_handler.model_style import ModelStyle
+from uncertainty_tool_call.bfcl.utils import (
     check_api_key_supplied,
     is_executable,
     is_multi_turn,

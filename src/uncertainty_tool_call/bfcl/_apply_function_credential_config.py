@@ -2,8 +2,8 @@ import glob
 import json
 import os
 
-from bfcl.constant import PROMPT_PATH
-from bfcl.eval_checker.executable_eval.custom_exception import NoAPIKeyError
+from uncertainty_tool_call.bfcl.constant import PROMPT_PATH
+from uncertainty_tool_call.bfcl.eval_checker.executable_eval.custom_exception import NoAPIKeyError
 
 ENV_VARS = ("GEOCODE_API_KEY", "RAPID_API_KEY", "OMDB_API_KEY", "EXCHANGERATE_API_KEY")
 PLACEHOLDERS = {}

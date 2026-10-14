@@ -12,13 +12,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics 
 
-import compute_auc 
+from uncertainty_tool_call import auc as compute_auc 
 
 
 from collections import defaultdict
 from dataclasses import dataclass, field, asdict 
 
-from bfcl.constant import (
+from uncertainty_tool_call.bfcl.constant import (
     MULTI_TURN_FUNC_DOC_FILE_MAPPING,
     MULTI_TURN_FUNC_DOC_PATH,
     PROJECT_ROOT,
@@ -28,7 +28,7 @@ from bfcl.constant import (
     TEST_FILE_MAPPING,
     TEST_IDS_TO_GENERATE_PATH,
 )
-from bfcl.eval_checker.eval_runner_helper import load_file
+from uncertainty_tool_call.bfcl.utils import load_file
 
 """
 Once the generated and evaluated files are saved to result/ and score/, given a model, combine all greedy and

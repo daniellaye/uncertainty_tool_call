@@ -1,4 +1,4 @@
-from bfcl.model_handler.handler_map import local_inference_handler_map
+from uncertainty_tool_call.bfcl.model_handler.handler_map import local_inference_handler_map
 
 # Items in the dictionary are in the format of:
 # {model_name: [

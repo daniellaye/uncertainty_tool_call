@@ -1,6 +1,6 @@
 import argparse
 
-from bfcl.constant import (
+from uncertainty_tool_call.bfcl.constant import (
     DOTENV_PATH,
     POSSIBLE_ANSWER_PATH,
     PROJECT_ROOT,
@@ -11,20 +11,20 @@ from bfcl.constant import (
     TEST_FILE_MAPPING,
     VERSION_PREFIX,
 )
-from bfcl.eval_checker.ast_eval.ast_checker import ast_checker
-from bfcl.eval_checker.eval_runner_helper import *
-from bfcl.eval_checker.executable_eval.custom_exception import BadAPIStatusError
-from bfcl.eval_checker.executable_eval.executable_checker import (
+from uncertainty_tool_call.bfcl.eval_checker.ast_eval.ast_checker import ast_checker
+from uncertainty_tool_call.bfcl.eval_checker.eval_runner_helper import *
+from uncertainty_tool_call.bfcl.eval_checker.executable_eval.custom_exception import BadAPIStatusError
+from uncertainty_tool_call.bfcl.eval_checker.executable_eval.executable_checker import (
     executable_checker_non_rest,
     executable_checker_rest,
 )
-from bfcl.eval_checker.multi_turn_eval.multi_turn_checker import (
+from uncertainty_tool_call.bfcl.eval_checker.multi_turn_eval.multi_turn_checker import (
     multi_turn_checker,
     multi_turn_irrelevance_checker,
 )
-from bfcl.eval_checker.multi_turn_eval.multi_turn_utils import is_empty_execute_response
-from bfcl.model_handler.handler_map import HANDLER_MAP
-from bfcl.utils import *
+from uncertainty_tool_call.bfcl.eval_checker.multi_turn_eval.multi_turn_utils import is_empty_execute_response
+from uncertainty_tool_call.bfcl.model_handler.handler_map import HANDLER_MAP
+from uncertainty_tool_call.bfcl.utils import *
 from dotenv import load_dotenv
 from tqdm import tqdm
 

@@ -1,8 +1,8 @@
 from keyword import kwlist
 
-from bfcl._llm_response_generation import parse_test_category_argument
-from bfcl.constant import POSSIBLE_ANSWER_PATH, PROMPT_PATH
-from bfcl.utils import (
+from uncertainty_tool_call.bfcl._llm_response_generation import parse_test_category_argument
+from uncertainty_tool_call.bfcl.constant import POSSIBLE_ANSWER_PATH, PROMPT_PATH
+from uncertainty_tool_call.bfcl.utils import (
     is_executable,
     is_java,
     is_js,

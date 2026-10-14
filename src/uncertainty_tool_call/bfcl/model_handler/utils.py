@@ -7,10 +7,10 @@ import re
 from functools import reduce
 from typing import Callable, List, Optional, Type, Union
 
-from bfcl.model_handler.constant import DEFAULT_SYSTEM_PROMPT, GORILLA_TO_OPENAPI
-from bfcl.model_handler.model_style import ModelStyle
-from bfcl.model_handler.parser.java_parser import parse_java_function_call
-from bfcl.model_handler.parser.js_parser import parse_javascript_function_call
+from uncertainty_tool_call.bfcl.model_handler.constant import DEFAULT_SYSTEM_PROMPT, GORILLA_TO_OPENAPI
+from uncertainty_tool_call.bfcl.model_handler.model_style import ModelStyle
+from uncertainty_tool_call.bfcl.model_handler.parser.java_parser import parse_java_function_call
+from uncertainty_tool_call.bfcl.model_handler.parser.js_parser import parse_javascript_function_call
 from tenacity import (
     retry,
     retry_if_exception_message,
