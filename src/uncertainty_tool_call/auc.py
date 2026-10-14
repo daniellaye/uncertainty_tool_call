@@ -316,7 +316,7 @@ if __name__ == "__main__":
 
     # Random baseline 
     aggregate_method = "random"
-    uq_scores = np.random.rand(len(uq_scores))
+    uq_scores = np.random.default_rng(28032025).random(len(uq_scores))
     aucroc, aucprc = compute_auroc(accs, uq_scores)
     naurc = compute_naurc(loss=loss, confidence_scores=uq_scores)
     print(f"{aggregate_method}:\tAUROC={aucroc:.2f}\tAUPRC={aucprc:.2f}\t1-NAURC={1-naurc:.2f}")

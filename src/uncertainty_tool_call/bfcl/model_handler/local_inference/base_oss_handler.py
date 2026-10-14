@@ -5,11 +5,11 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
-from bfcl.constant import RESULT_PATH
-from bfcl.model_handler.base_handler import BaseHandler
-from bfcl.model_handler.model_style import ModelStyle
-from bfcl.model_handler.local_inference.constant import VLLM_PORT
-from bfcl.model_handler.utils import (
+from uncertainty_tool_call.bfcl.constant import RESULT_PATH
+from uncertainty_tool_call.bfcl.model_handler.base_handler import BaseHandler
+from uncertainty_tool_call.bfcl.model_handler.model_style import ModelStyle
+from uncertainty_tool_call.bfcl.model_handler.local_inference.constant import VLLM_PORT
+from uncertainty_tool_call.bfcl.model_handler.utils import (
     default_decode_ast_prompting,
     default_decode_execute_prompting,
     func_doc_language_specific_pre_processing,
@@ -128,6 +128,8 @@ class OSSHandler(BaseHandler, EnforceOverrides):
                         "--gpu-memory-utilization",
                         str(gpu_memory_utilization),
                         "--trust-remote-code",
+                        "--generation-config",
+                        "vllm",
                     ],
                     stdout=subprocess.PIPE,  # Capture stdout
                     stderr=subprocess.PIPE,  # Capture stderr

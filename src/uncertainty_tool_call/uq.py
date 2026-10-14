@@ -10,28 +10,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics 
 
-import compute_auc 
+from uncertainty_tool_call import auc as compute_auc 
 
 
 from collections import defaultdict
 import logging
 
-from semantic_uncertainty.semantic_uncertainty.uncertainty.uncertainty_measures import p_true as p_true_utils
-from semantic_uncertainty.semantic_uncertainty.uncertainty.utils import utils
-from semantic_uncertainty.semantic_uncertainty.uncertainty.uncertainty_measures.p_ik import get_p_ik
-from semantic_uncertainty.semantic_uncertainty.uncertainty.uncertainty_measures.semantic_entropy import get_semantic_ids, \
-                                                                                                        logsumexp_by_id, \
-                                                                                                        predictive_entropy, \
-                                                                                                        predictive_entropy_rao, \
-                                                                                                        cluster_assignment_entropy, \
-                                                                                                        context_entails_response, \
-                                                                                                        EntailmentDeberta, \
-                                                                                                        EntailmentGPT4, \
-                                                                                                        EntailmentGPT35, \
-                                                                                                        EntailmentGPT4Turbo, \
-                                                                                                        EntailmentLlama
-# from bfcl.eval_checker.ast_eval.ast_checker import ast_checker, simple_function_checker
-from ast_checker_for_entropy import ast_checker, simple_function_for_entropy_checker
+# Only these four pure-numpy functions are used. The original imported the
+# neural entailment models too, but never instantiated them; dropping those
+# imports is what keeps this step free of torch/transformers.
+from uncertainty_tool_call.entropy import (
+    logsumexp_by_id,
+    predictive_entropy,
+    predictive_entropy_rao,
+    cluster_assignment_entropy,
+)
+# from uncertainty_tool_call.bfcl.eval_checker.ast_eval.ast_checker import ast_checker, simple_function_checker
+from uncertainty_tool_call.ast_checker import ast_checker, simple_function_for_entropy_checker
 
 
 import scipy
@@ -782,17 +777,6 @@ def write_length_measure(greedy_high_temp_generation: list) -> dict:
     return greedy_high_temp_generation
 
 
-def write_ptrue(greedy_high_temp_generation: list) -> dict:
-    
-    for row in greedy_high_temp_generation:
-        assert "uq_scores" in row
-        sample = row["greedy_output"]
- 
-        row["uq_scores"]["ptrue"]  =  sample["p_true_log_prob"]
-    return greedy_high_temp_generation
-
-
-
 def write_semantic_entropy(greedy_high_temp_generation: list, entailment_method="string_match") -> dict:
     
 
@@ -1022,6 +1006,11 @@ if __name__ == "__main__":
     with open(f'{args.combined_path}/combined_{args.test_name}.json') as f:
         data = json.load(f)
 
+    # The write_* helpers below annotate row["uq_scores"] in place and assert
+    # the key exists. Input files carry generation fields only.
+    for row in data:
+        row.setdefault("uq_scores", {})
+
     
     # First, given a combined file with greedy and high temp outputs, write different UQ scores in-place to create a new UQ-annotated file
 
@@ -1035,8 +1024,6 @@ if __name__ == "__main__":
     # Write length as UQ 
     data = write_length_measure(data)
 
-    # Write ptrue as UQ
-    # data = write_ptrue(data)
 
     # Write different greedy logprobs-based methods (sum, min, mean)
     data = write_greedy_logprobs_measure(data)
@@ -1112,12 +1099,11 @@ if __name__ == "__main__":
     # Length 
     nlen = np.array([- row["uq_scores"]["length"] for row in data])
     
-    # PTrue
-    # If ptrue is not found, set to an array of None
-    if "ptrue" not in data[0]["uq_scores"]:
-        ptrue = np.array([None] * len(data))
-    else:
-        ptrue = np.array([row["uq_scores"]["ptrue"] for row in data])
+    # P(true) is deliberately not computed here. Unlike every other estimator,
+    # it is not derivable from a combined file: it needs a separate generation
+    # pass that asks the model whether its own call is correct, and
+    # greedy_output["p_true_log_prob"] is null in the combined files. Dropping
+    # it keeps the input contract to generation fields only.
 
     # String match methods 
     nse = np.array([- row["uq_scores"]["string_match_se"] for row in data])
@@ -1133,7 +1119,9 @@ if __name__ == "__main__":
 
 
     # Random baseline
-    random_scores = np.random.rand(len(data))
+    # Seeded: the published run used the unseeded global RNG, so its `random`
+    # row is a one-off draw. 28032025 is the seed already used for the bootstrap.
+    random_scores = np.random.default_rng(28032025).random(len(data))
 
     # Results to write to csv:
     uq_methods = []
@@ -1161,7 +1149,6 @@ if __name__ == "__main__":
                             "SNLL", "N_SNLL", "AST_SNLL", "AST_N_SNLL", \
                             "DSNLL", "N_DSNLL", "AST_DSNLL", "AST_N_DSNLL", \
                             "num_clusters", "num_ast_clusters", \
-                            "ptrue", \
                             "length", "random",\
                              ], \
                             [min_logprob, sum_logprob, mean_logprob, \
@@ -1171,7 +1158,6 @@ if __name__ == "__main__":
                             snll, n_snll, ast_snll, ast_n_snll, \
                             dsnll, n_dsnll, ast_dsnll, ast_n_dsnll, \
                             num_clusters, num_ast_clusters, \
-                            ptrue, \
                             nlen, random_scores, \
                             ]):
 

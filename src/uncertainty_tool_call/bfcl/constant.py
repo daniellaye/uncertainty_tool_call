@@ -1,15 +1,24 @@
+import os
 from pathlib import Path
 
-# NOTE: These paths are relative to the `bfcl` directory where this script is located.
-RESULT_PATH = "../result/"
-PROMPT_PATH = "../data/"
-MULTI_TURN_FUNC_DOC_PATH = "../data/multi_turn_func_doc/"
-POSSIBLE_ANSWER_PATH = "../data/possible_answer/"
-SCORE_PATH = "../score/"
-DOTENV_PATH = "../.env"
-UTILS_PATH = "../utils/"
-PROJECT_ROOT = "../"
-TEST_IDS_TO_GENERATE_PATH = "../test_case_ids_to_generate.json"
+# Read-only assets shipped inside the package, vs. everything the harness
+# writes. Upstream resolved both against the repo checkout, which meant an
+# installed copy read from -- and mkdir'd into -- site-packages.
+PACKAGE_ROOT = Path(__file__).parent
+OUTPUT_ROOT = Path(os.environ.get("UTOOLCALL_OUTPUT_DIR", Path.cwd())).expanduser()
+
+# Read-only, inside the package:
+PROMPT_PATH = "data/"
+MULTI_TURN_FUNC_DOC_PATH = "data/multi_turn_func_doc/"
+POSSIBLE_ANSWER_PATH = "data/possible_answer/"
+UTILS_PATH = "utils_data/"
+TEST_IDS_TO_GENERATE_PATH = "test_case_ids_to_generate.json"
+
+# Writable, under the working directory:
+RESULT_PATH = "result/"
+SCORE_PATH = "score/"
+DOTENV_PATH = ".env"
+PROJECT_ROOT = "."
 
 VERSION_PREFIX = "BFCL_v3"
 
@@ -189,17 +198,20 @@ MULTI_TURN_FUNC_DOC_FILE_MAPPING = {
 }
 
 
-# Construct the full path to use by other scripts
-script_dir = Path(__file__).parent
-RESULT_PATH = (script_dir / RESULT_PATH).resolve()
-PROMPT_PATH = (script_dir / PROMPT_PATH).resolve()
-MULTI_TURN_FUNC_DOC_PATH = (script_dir / MULTI_TURN_FUNC_DOC_PATH).resolve()
-POSSIBLE_ANSWER_PATH = (script_dir / POSSIBLE_ANSWER_PATH).resolve()
-SCORE_PATH = (script_dir / SCORE_PATH).resolve()
-DOTENV_PATH = (script_dir / DOTENV_PATH).resolve()
-UTILS_PATH = (script_dir / UTILS_PATH).resolve()
-PROJECT_ROOT = (script_dir / PROJECT_ROOT).resolve()
-TEST_IDS_TO_GENERATE_PATH = (script_dir / TEST_IDS_TO_GENERATE_PATH).resolve()
+# Resolve each path against the root it belongs to.
+PROMPT_PATH = (PACKAGE_ROOT / PROMPT_PATH).resolve()
+MULTI_TURN_FUNC_DOC_PATH = (PACKAGE_ROOT / MULTI_TURN_FUNC_DOC_PATH).resolve()
+POSSIBLE_ANSWER_PATH = (PACKAGE_ROOT / POSSIBLE_ANSWER_PATH).resolve()
+UTILS_PATH = (PACKAGE_ROOT / UTILS_PATH).resolve()
+TEST_IDS_TO_GENERATE_PATH = (PACKAGE_ROOT / TEST_IDS_TO_GENERATE_PATH).resolve()
 
-RESULT_PATH.mkdir(parents=True, exist_ok=True)
-SCORE_PATH.mkdir(parents=True, exist_ok=True)
+RESULT_PATH = (OUTPUT_ROOT / RESULT_PATH).resolve()
+SCORE_PATH = (OUTPUT_ROOT / SCORE_PATH).resolve()
+DOTENV_PATH = (OUTPUT_ROOT / DOTENV_PATH).resolve()
+PROJECT_ROOT = (OUTPUT_ROOT / PROJECT_ROOT).resolve()
+
+
+def ensure_output_dirs() -> None:
+    """Create the writable output directories. Called from the CLI, not on import."""
+    RESULT_PATH.mkdir(parents=True, exist_ok=True)
+    SCORE_PATH.mkdir(parents=True, exist_ok=True)
