@@ -1,0 +1,159 @@
+
+\documentclass[10pt]{article} %
+\usepackage[preprint]{tmlr}
+% \usepackage{tmlr}
+
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{verbatim}
+\usepackage{newfloat}
+\usepackage{listings}
+\lstset{%
+	basicstyle={ai\footnotesize\ttfamily},
+	numbers=left,numberstyle=\footnotesize,xleftmargin=2em,
+	aboveskip=0pt,belowskip=0pt,
+	showstringspaces=false,tabsize=2,breaklines=true}
+\floatstyle{ruled}
+\newfloat{listing}{tb}{lst}{}
+\floatname{listing}{Listing}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{wrapfig} 
+
+\definecolor{bestcolor}{RGB}{0,128,0}
+\newcommand{\best}[1]{\textcolor{bestcolor}{\textbf{#1}}}
+
+\usepackage{lineno}
+
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+
+\usepackage{cleveref}
+\crefname{section}{Section}{Sections}
+\def\sectionautorefname{Section}
+
+\usepackage{pdflscape}
+
+\usepackage{tikz}
+
+\lstdefinestyle{noindent}{
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\ttfamily,
+  breaklines=true,
+  aboveskip=5pt,
+  belowskip=0pt,
+  showspaces=false,
+  showtabs=false,
+  showstringspaces=false,
+  xleftmargin=-\parindent,
+  resetmargins=true,
+  gobble=0
+}
+\newcommand{\itcomment}[1]{\textnormal{\itshape #1}}
+
+\usepackage{enumitem}
+\usepackage{caption}
+
+\Crefname{equation}{Eq.}{Eqs.}
+\Crefname{figure}{Fig.}{Figs.}
+\Crefname{tabular}{Tab.}{Tabs.}
+\Crefname{section}
+{Sec.}{Secs.}
+\Crefname{appendix}
+{App.}{Apps.}
+\Crefname{theorem}{Thm.}{Thms.}
+\newtheorem{conjecture}{Conjecture}
+
+\setlength{\aftermaketitskip}{0.01in}
+\setlength{\interauthorskip}{0.02in}
+
+\title{Uncertainty Quantification for LLM Function-Calling}
+
+
+
+
+\author{\name Zihuiwen Ye\thanks{~Equal contribution, ~ $^+$ Joint senior authorship} \\
+% \addr University of Oxford 
+% \ANDAUTHOR
+\name Lukas Aichberger$^*$ \\
+\addr University of Oxford
+\ANDAUTHOR
+\name Michael Kirchhof \\
+% \addr Apple
+% \ANDAUTHOR
+\name Sinead Williamson \\
+% \addr Apple
+% \ANDAUTHOR
+\name Luca Zappella \\
+\addr Apple
+\ANDAUTHOR
+\name Yarin Gal \\
+\addr University of Oxford
+\ANDAUTHOR
+\name Arno Blaas$^+$ \\
+% \addr Apple
+% \ANDAUTHOR
+\name Adam Goli{\'n}ski$^+$ \\
+\addr Apple 
+}
+
+      
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\newcommand{\method}{\textbf{G-NLL}$_{SMT}$ }
+
+
+\def\month{MM}  %
+\def\year{YYYY} %
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}} %
+
+\newcommand{\tablescale}{0.68}
+
+\definecolor{pink1}{RGB}{239, 156, 157}
+\definecolor{yellow2}{RGB}{240, 227, 172}
+\definecolor{green3}{RGB}{159, 209, 173}
+\definecolor{blue4}{RGB}{166, 189, 219}
+\definecolor{cyan5}{RGB}{187, 226, 244}
+\definecolor{purple6}{RGB}{203, 158, 186}
+
+\begin{document}
+
+
+\maketitle
+
+
+
+
+\begin{abstract}
+\input{text/abstract}
+\end{abstract}
+
+\input{text/introduction}
+\input{text/related_work}
+\input{text/benchmark}
+\input{text/discussion}
+
+
+
+\bibliography{references}
+\bibliographystyle{tmlr}
+
+\newpage
+\appendix
+\input{text/appendix}
+
+
+
+\end{document}

@@ -1,0 +1,33 @@
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{llcccccccc}
+\toprule
+ &  & \multicolumn{3}{c}{\textbf{Single-sample}} & \multicolumn{3}{c}{\textbf{Multi-sample}} & \multicolumn{2}{c}{\textbf{Other}}  \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8} \cmidrule(lr){9-10}
+\textbf{Category} & \textbf{Task} & \textbf{MAX} & \textbf{AVG} & \textbf{G-NLL} &  \textbf{SE}$_{EXM}$ & \textbf{DSE}$_{EXM}$ & \textbf{PE} & \textbf{P}$_{true}$ & \textbf{LEN} \\
+\hline
+\multirow{4}{*}{\textbf{Individual}}
+& \textbf{Simple} & $0.74$ \tiny{±$.045$} & \underline{$0.76$} \tiny{±$.046$} & \best{$0.77$} \tiny{±$.045$} & $0.73$ \tiny{±$.049$} & $0.73$ \tiny{±$.049$} & $0.72$ \tiny{±$.045$} & $0.69$ \tiny{±$.052$} & $0.56$ \tiny{±$.052$} \\
+& \textbf{Multiple} & $0.71$ \tiny{±$.065$} & \underline{$0.74$} \tiny{±$.066$} & \best{$0.76$} \tiny{±$.065$} & $0.73$ \tiny{±$.073$} & $0.73$ \tiny{±$.073$} & $0.71$ \tiny{±$.071$} & $0.67$ \tiny{±$.075$} & $0.58$ \tiny{±$.081$} \\
+& \textbf{Parallel} & $0.66$ \tiny{±$.059$} & \best{$0.72$} \tiny{±$.058$} & \underline{$0.71$} \tiny{±$.058$} & $0.66$ \tiny{±$.059$} & $0.66$ \tiny{±$.059$} & $0.67$ \tiny{±$.061$} & $0.62$ \tiny{±$.063$} & $0.49$ \tiny{±$.064$} \\
+& \textbf{Parallel-Multiple} & $0.72$ \tiny{±$.048$} & \underline{$0.74$} \tiny{±$.048$} & \best{$0.76$} \tiny{±$.048$} & $0.73$ \tiny{±$.051$} & $0.73$ \tiny{±$.051$} & $0.72$ \tiny{±$.052$} & $0.67$ \tiny{±$.059$} & $0.55$ \tiny{±$.060$} \\
+\hline
+\multirow{4}{*}{\textbf{Combinations}}
+& \textbf{Simple + Multiple} & $0.73$ \tiny{±$.036$} & \underline{$0.75$} \tiny{±$.037$} & \best{$0.77$} \tiny{±$.037$} & $0.73$ \tiny{±$.041$} & $0.73$ \tiny{±$.041$} & $0.72$ \tiny{±$.038$} & $0.68$ \tiny{±$.042$} & $0.57$ \tiny{±$.044$} \\
+& \textbf{Simple + Parallel} & $0.70$ \tiny{±$.037$} & \underline{$0.71$} \tiny{±$.039$} & \best{$0.75$} \tiny{±$.036$} & \underline{$0.71$} \tiny{±$.038$} & $0.70$ \tiny{±$.038$} & $0.67$ \tiny{±$.040$} & $0.68$ \tiny{±$.038$} & $0.59$ \tiny{±$.039$} \\
+& \textbf{Multiple + Parallel-Multiple} & $0.73$ \tiny{±$.037$} & $0.71$ \tiny{±$.039$} & \best{$0.77$} \tiny{±$.037$} & \underline{$0.74$} \tiny{±$.041$} & $0.73$ \tiny{±$.041$} & $0.68$ \tiny{±$.041$} & $0.69$ \tiny{±$.045$} & $0.64$ \tiny{±$.045$} \\
+        & \textbf{All Combined}  & \underline{$0.72$} \tiny{±$.026$} & $0.71$ \tiny{±$.027$} & \best{$0.76$} \tiny{±$.025$} & \underline{$0.72$} \tiny{±$.027$} & \underline{$0.72$} \tiny{±$.027$} & $0.68$ \tiny{±$.028$} & $0.68$ \tiny{±$.029$} & $0.61$ \tiny{±$.030$} \\
+\hline
+\multirow{2}{*}{\textbf{Unanswerable}}
+& \textbf{Simple + Irrelevance} & $0.78$ \tiny{±$.026$} & \underline{$0.80$} \tiny{±$.025$} & \best{$0.81$} \tiny{±$.025$} & $0.76$ \tiny{±$.026$} & $0.76$ \tiny{±$.026$} & $0.79$ \tiny{±$.026$} & $0.76$ \tiny{±$.026$} & $0.50$ \tiny{±$.032$} \\
+& \textbf{All Combined + Irrelevance} & $0.74$ \tiny{±$.020$} & \underline{$0.77$} \tiny{±$.020$} & \best{$0.78$} \tiny{±$.020$} & $0.74$ \tiny{±$.020$} & $0.74$ \tiny{±$.020$} & $0.75$ \tiny{±$.021$} & $0.71$ \tiny{±$.022$} & $0.49$ \tiny{±$.024$} \\
+\bottomrule
+\end{tabular}}
+
+\caption{
+\color{black} 
+Results:
+Mean AUROC $\pm$ mean standard error (mean over eight LLMs) for individual tasks, task combinations, and unanswerable requests described in \Cref{sec:individual_tasks}, \Cref{sec:combinations}, and \Cref{sec:irrelevance_combinations} respectively.
+The best result in \best{green}, \underline{underlined} second best.
+For per-LLM results, see \Cref{fig:individual_tasks,fig:combinations,fig:irrelevance_combinations}
+(\Cref{app:detailed_results}).
+}

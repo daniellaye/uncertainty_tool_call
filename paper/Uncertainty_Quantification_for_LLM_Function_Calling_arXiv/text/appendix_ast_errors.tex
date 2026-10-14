@@ -1,0 +1,31 @@
+\section{AST Decoding Errors and Effective Sample Sizes}
+\label{app:ast_errors}
+
+As described in \Cref{sec:individual_tasks}, we exclude requests for which greedy decoding results in an AST decoding error (i.e., the output cannot be interpreted by the Python interpreter). Here, we quantify the frequency of these errors and their impact on our conclusions.
+
+On the \emph{All Combined} split (1000 datapoints in total), $3.4\%$ of the outputs are AST decoding errors, averaged across 8 models.
+\Cref{tab:effective_sample_sizes} shows the effective sample size (number of successfully parsed outputs) per model.
+We observe that the majority of models produce valid outputs for almost all requests, with the exception of gemma-3-4b-it, which has a notably lower effective sample size of 832.
+
+To assess whether excluding these errors affects our conclusions, we compared the UQ method rankings when including AST decoding errors (marking them as incorrect) versus excluding them. The Spearman rank correlation between the two rankings is $0.94$, and the ordering of G-NLL and entropy-based methods stays the same for all.
+We further note that a non-decodable function call does not result in an actual function execution, and hence it does not pose a risk from the perspective of preventing potentially harmful function calls.
+
+\begin{table}[h!]
+\centering
+\caption{Effective sample sizes (number of successfully AST-parsed outputs) per model on the \emph{All Combined} split (1000 datapoints total).}
+\label{tab:effective_sample_sizes}
+\begin{tabular}{lc}
+\toprule
+\textbf{Model} & \textbf{Effective sample size} \\
+\midrule
+Qwen2.5-0.5B-Instruct & 983 \\
+Qwen2.5-3B-Instruct & 980 \\
+Qwen2.5-7B-Instruct & 999 \\
+Qwen3-4B-Instruct-2507 & 997 \\
+Ministral-8B-Instruct-2410 & 987 \\
+gemma-2-9b-it & 987 \\
+gemma-3-4b-it & 832 \\
+gemma-3-12b-it & 962 \\
+\bottomrule
+\end{tabular}
+\end{table}

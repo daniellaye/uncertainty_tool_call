@@ -1,0 +1,173 @@
+\section{Uncertainty Estimators} \label{app:uq}
+
+In response to an input question $x$, LLMs output sequences of tokens, so let $y = (y_1, \dotsc, y_L)$ denote an output sequence of length $L$. The first family of uncertainty estimation methods uses the greedily decoded sequence, where the LLM always chooses the most likely next token. We denote this sequence with $y^G$. Each token $y_i^G$ comes with a negative log likelihood value (NLL, i.e., token uncertainty) that the LLM has assigned to it during generation based on the previous tokens $y_{<i} = (y_1, \dots, y_{i-1})$, which we denote as $- \log p(y^G_i|y^G_{<i}, x)$. Single-sample uncertainty methods differ in how they aggregate these probabilities across the sequence into a single uncertainty $u(y^G)$ value for the whole sequence.
+
+\textbf{MAX} outputs the highest NLL value in the sequence \begin{equation}
+u_{\text{MAX}}(y^G) := \max -\log p(y^G_i|y^G_{<i}, x).\end{equation}
+
+\textbf{G-NLL} sums up the NLLs of the sequence (name as per \citet{aichberger2024rethi}): 
+\begin{equation}
+\label{eq:G-NLL}
+    u_{\text{G-NLL}}(y^G) := \sum_i^L -\log p(y^G_i|y^G_{<i}, x).
+\end{equation}
+
+\textbf{AVG} averages the NLLs. It thus normalizes G-NLL by length and can also be interpreted as the logarithm of the sequence perplexity \begin{equation}u_{\text{AVG}}(y^G) := -1/L \sum_i^L \log p(y^G_i|y^G_{<i}, x).\end{equation}
+
+\textbf{LEN} is a baseline that simply outputs the number of tokens in the answer, treating longer sequences as inherently more uncertain. This is an obviously flawed uncertainty estimator and is used more as a sanity-checking baseline that should perform close to random: 
+\begin{equation}u_{\text{LEN}}(y^G) := L.\end{equation}
+
+The second family of uncertainty estimators samples $J=10$ responses $(y^1, \dots, y^J)$ from the LLM, i.e., based on the next-token probabilities with temperature 1. It then combines them into one uncertainty estimate $u((y^1, \dots, y^J))$ based on different ways of clustering the responses $y^j$.
+
+\textbf{PE} does not perform any clustering and treats all outputs as different, even if their decoded strings and even their chosen tokens are the same. This gives a naïve estimate of the predictive entropy of the sequence distribution.
+\begin{align}
+&u_{\text{PE}}((y^1, \dots, y^J))
+:= H[p(y|x)]
+\\
+&= -E_{y \sim p(y|x)}[\log p(y|x)] \\
+&\approx -1/J \sum_{j=1}^{J} 1/L_j\sum_{i}^{L_j} \log p(y^{j}_i|y^{j}_{<i}, x)
+\end{align}
+As for AVG, each sampled sequence is normalized by its own length $L_j$, so PE is estimated on a per-token scale; like all the estimators in this section, larger values indicate higher uncertainty.
+
+\textbf{SE}$_{EXM}$: Semantic Entropy \citep{farquhar2024detec} methods first cluster the output sequences $(y^1, \dots, y^J)$ and then compute an entropy over the cluster distribution $p(c | x)$. SE$_{EXM}$ uses exact string matching to determine whether two outputs belong to the same cluster, i.e., their decoded text must be exactly equal. 
+\begin{align}
+\label{eq:se}
+&u_{\text{SE}}((c^1, \dots, c^K))
+:= H[p(c | x)]
+\\
+&= -E_{c \sim p(c|x)}[\log p(c | x)] \\
+&\approx - \sum_{k=1}^K p(c^k | x) \log p(c^k | x) ,
+\end{align}
+with 
+\begin{equation}  \label{eq:se_clusterprob}
+p(c | x) = \sum_{j=1}^J \mathds{1} \! \{ y^j \in c | x \} p(y^j | x) \ .
+\end{equation}
+The cluster probabilities are then normalized to 1, following~\citet{kuhn2023semantic}.
+
+
+\textbf{DSE}$_{EXM}$: Discrete Semantic Entropy uses the same clustering algorithm but does not consider the individual sequence likelihoods to compute the cluster distribution $p(c | x)$:
+\begin{equation}  \label{eq:dse}
+p(c | x) = \sum_{j=1}^J \mathds{1} \! \{ y \in c | x \} \ .
+\end{equation}
+\textbf{SE}$_{AST}$ uses a clustering algorithm that is more suited to the FC setup. In particular, checks whether two decoded function calls are equal up to permutations in their (named) arguments. This is called abstract syntax tree (AST) matching, because it treats two function calls as equivalent if their call will indeed lead to the same inputs to the same function. We first use the AST parser implemented in BFCL to extract the AST of each function call, cast as a dictionary. We then group the calls into clusters based on their key-value pairs' equivalence.  
+
+\textbf{DSE}$_{AST}$ uses abstract syntax tree matching to form clusters. 
+
+
+\textbf{P(True)} \citet{kadavath2022languagemodelsmostlyknow} look at the probability with which an LLM predicts that $y^G$ is true, given few-shot examples and the set of all generated responses $\{y^1, \dots, y^J\}$ serving as ``brainstormed'' alternatives:
+\begin{equation}
+    u_{\text{P(True)}}(y^G) := p(y = \text{A} \mid x_{\text{P(True)}}) \ ,
+\end{equation}
+
+where $x_{\text{P(True)}}$ consists of the following parts:
+\begin{enumerate}
+    \item System prompt:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    <|im_start|>system
+    You are an expert in composing functions. You are given a question and a set of possible functions. You are also given brainstormed ideas and a possible answer. Based on the question, you have to assess if the possible answer achieves the purpose.
+    
+    If none of the functions can be used, it should be stated out in the answer. If the given question lacks the parameters required by the function, it should also be pointed out in the answer. Otherwise, only function calls should be included in the answer.
+    
+    Any invoked function(s) MUST be put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)]
+    <|im_end|>
+    \end{lstlisting}
+    \item Incorrect few-shot example: 
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    <|im_start|>user
+    Question: (*@\itcomment{[few-shot question inserted here]}@*)
+
+    Here is a list of functions in JSON format that can be invoked:
+    (*@\itcomment{[few-shot function inserted here]}@*)
+    
+    Here are some brainstormed ideas:
+    (*@\itcomment{[few-shot brainstormed ideas inserted here]}@*)
+    
+    Possible answer:
+    (*@\itcomment{[few-shot incorrect answer inserted here]}@*)
+    
+    Is the possible answer:
+    A) True
+    B) False
+    Respond with A or B only.<|im_end|>
+    <|im_start|>assistant
+    The possible answer is: B<|im_end|>
+     \end{lstlisting}
+
+    \item Correct few-shot example: 
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    <|im_start|>user
+    Question: (*@\itcomment{[few-shot question inserted here]}@*)
+    
+    Here is a list of functions in JSON format that can be invoked:
+    (*@\itcomment{[few-shot function inserted here]}@*)
+    
+    Here are some brainstormed ideas:
+    (*@\itcomment{[few-shot brainstormed ideas inserted here]}@*)
+    
+    Possible answer:
+    (*@\itcomment{[few-shot correct answer inserted here]}@*)
+    
+    Is the possible answer:
+    A) True
+    B) False
+    Respond with A or B only.<|im_end|>
+    <|im_start|>assistant
+    The possible answer is: A<|im_end|>
+    \end{lstlisting}
+
+    \item Actual example for which the correctness of $y^G$ is evaluated: 
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    <|im_start|>user
+    Question: (*@\itcomment{[question inserted here]}@*)
+    
+    Here is a list of functions in JSON format that can be invoked:
+    (*@\itcomment{[function inserted here]}@*)
+    
+    Here are some brainstormed ideas:
+    (*@\itcomment{[$\{y^1, \dots, y^J\}$ inserted here]}@*)
+    
+    Possible answer:
+    (*@\itcomment{[$y^{G}$ inserted here]}@*)
+    
+    Is the possible answer:
+    A) True
+    B) False
+    Respond with A or B only.<|im_end|>
+    <|im_start|>assistant
+    The possible answer is: 
+    \end{lstlisting}
+    
+\end{enumerate}
+
+
+\noindent 
+Throughout the p(True)  experiments, we use the following\textcolor{white}{0} few-shot example: 
+\begin{enumerate}
+    \item Few-shot question:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    What is 19/53?
+    \end{lstlisting}
+    \item Few-shot function:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    [{'name': 'divide', 'description': 'Divides two numbers.', 'parameters': {'type': 'dict', 'properties': {'numerator': {'type': 'float', 'description': 'The numerator of the fraction.'}, 'denominator': {'type': 'float', 'description': 'The denominator of the fraction.']}}, 'required': ['numerator', 'denominator']}}, {'name': 'add', 'description': 'Adds two integers.', 'parameters': {'type': 'dict', 'properties': {'a': {'type': 'int', 'description': 'The first integer.'}, 'b': {'type': 'int', 'description': 'The second integer.'}}}, 'required': ['a', 'b']}}]
+    \end{lstlisting}
+    \item Few-shot brainstormed ideas:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    [divide(denominator=53, numerator=19)]
+    [divide(numerator=53, denominator=53)]
+    [divide(numerator=19, denominator=19)]
+    [divide(numerator=19, denominator=53)]
+    \end{lstlisting}
+     \item Few-shot incorrect answer:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    [divide(numerator=53, denominator=19)]
+    \end{lstlisting}
+    \item Few-shot correct answer:
+    \begin{lstlisting}[style=noindent, language=Python, escapeinside={(*@}{@*)}, numbers=none]
+    [divide(numerator=19, denominator=53)]
+    \end{lstlisting}
+\end{enumerate}
+
+
+
+
+

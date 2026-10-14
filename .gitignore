@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Downloaded by `utoolcall fetch-combined` -- not tracked (105 MB, GitHub Release).
+/data/combined/
+
+# Pipeline outputs
+/result/
+/score/
+/generations/
+/uq/
+/table1.tex
+
+# Cluster logs
+*.out
+*.err
