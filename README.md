@@ -7,8 +7,7 @@ estimate predict whether an LLM's function call is correct? The paper compares
 eight uncertainty estimators across ten task settings from the Berkeley
 Function Calling Leaderboard (BFCL), averaged over eight open-weight LLMs.
 **Table 1** is the main result: mean AUROC ± mean standard error per
-(task, estimator) pair. This repository reproduces seven of its eight estimator
-columns; P(true) is left out because it needs a separate generation pass.
+(task, estimator) pair. 
 
 ## Reproducing Table 1
 
@@ -84,7 +83,6 @@ sbatch slurm/uq_all.sh          # writes to uq/, the directory step 4 reads
 utoolcall table1 --scores_dir uq/ -o table1.tex
 ```
 
-
 ---
 
 
@@ -97,28 +95,27 @@ Optional, and needs vllm and one GPU. This step shows how the combined files fro
 pip install -e '.[generate,vllm]'
 
 utoolcall prepare --model Qwen/Qwen2.5-0.5B-Instruct \
-              --task simple --samples 10 --temperature 1.5
+              --task simple --samples 10 --temperature 1.0
 ```
 
-To provide more context, these are the steps `prepare` runs. The BFCL harness is
-nested inside the package, so it is invoked as a module rather than as a
-`utoolcall` subcommand:
+On a SLURM cluster, `sbatch slurm/prepare.sh` runs this command. Then to compute UQ follow step 3 above to run `utoolcall uq` on the result.
+
+To provide more context, these are the steps `prepare` runs. 
 
 ```bash
 M=Qwen/Qwen2.5-0.5B-Instruct
 T=simple
 MODEL_DIR=Qwen_Qwen2.5-0.5B-Instruct
-MULTI=m=10_temperature=1.5_model=$MODEL_DIR
+MULTI=m=10_temperature=1.0_model=$MODEL_DIR
 
 # 1. greedy decode -- the prediction whose correctness is scored
 python -m uncertainty_tool_call.bfcl generate \
     --model $M --test-category $T --temperature 0
 
 # 2. M samples at high temperature -- these estimate its uncertainty.
-#    One invocation per sample: the harness has no "draw N samples" flag.
 for m in $(seq 1 10); do
   python -m uncertainty_tool_call.bfcl generate \
-      --model $M --test-category $T --temperature 1.5 \
+      --model $M --test-category $T --temperature 1.0 \
       --result-dir result/$MULTI/m=$m
 done
 
@@ -140,11 +137,6 @@ utoolcall combine \
 The result lands in `combined/<model>/combined_<task>.json`, the same format as
 the step-2 download.
 
-BFCL starts vLLM with `--generation-config vllm`, so vLLM does not apply a
-model's recommended sampling settings (e.g. Qwen2.5's repetition penalty). The
-paper's Qwen2.5, Gemma-2 and Ministral generations were made this way; its
-Qwen3 and Gemma-3 samples used those models' recommended top-k/top-p.
-
 ## License
 
 Apache-2.0 (see `LICENSE`). The Berkeley Function Calling Leaderboard (BFCL,
@@ -153,4 +145,3 @@ included at `src/uncertainty_tool_call/bfcl/`, modified from upstream commit
 `f092d154` to record per-token log-probabilities and add Qwen, Gemma and
 Ministral handlers. `src/uncertainty_tool_call/entropy.py` copies four
 functions from [semantic_uncertainty](https://github.com/jlko/semantic_uncertainty).
-The paper source under `paper/` carries its own LICENSE.

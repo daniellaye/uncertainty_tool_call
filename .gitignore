@@ -13,9 +13,14 @@ venv/
 # Pipeline outputs
 /result/
 /score/
+# written by `utoolcall prepare` when UTOOLCALL_OUTPUT_DIR is unset
+/combined/
 /generations/
 /uq/
 /table1.tex
+
+# Personal cluster scripts, kept locally only
+/slurm/local/
 
 # Cluster logs
 *.out

@@ -8,7 +8,7 @@ semantic entropy", Nature 2024.
 Only these four functions are used by this project. The upstream module also
 provides neural entailment models for clustering free-form text; this work
 clusters function calls by exact match and by abstract syntax tree instead
-(see `ast_checker.py`), so none of that is needed here.
+(see `uq.py`), so none of that is needed here.
 """
 
 import numpy as np

@@ -1,35 +1,32 @@
 #!/bin/bash
+#SBATCH --job-name=utoolcall-uq
 #SBATCH --cpus-per-task=8
 #SBATCH --time=06:00:00
-#SBATCH --job-name="utoolcall-uq"
-#SBATCH --output=/users/zihye/logs/slurm-utoolcall-uq-%j.out
-#SBATCH --error=/users/zihye/logs/slurm-utoolcall-uq-%j.err
 
-# Recompute the uncertainty estimators for all 8 models x 10 tasks, then build
-# Table 1. CPU only -- no GPU is needed for this step.
+# Compute the uncertainty estimators for all 8 models x 10 tasks, then build
+# Table 1. CPU only; no GPU is needed.
+#
+# Submit from the repository root, with the environment where you ran
+# `pip install -e .` activated (sbatch passes it on to the job):
 #
 #   sbatch slurm/uq_all.sh
 #
-# Roughly 1.5 min per model/task, so ~2 hours for the full sweep.
+# Add the #SBATCH options your cluster needs (partition, account, ...). The log
+# goes to slurm-<jobid>.out in the directory you submitted from. Without SLURM,
+# `bash slurm/uq_all.sh` runs the same loop in the foreground.
+#
+# Reads data/combined/ (from `utoolcall fetch-combined`) and writes uq/. Set
+# UTOOLCALL_COMBINED or UTOOLCALL_UQ_OUT to use other directories.
 
 set -eo pipefail
 
-export CONDA_ENVS_PATH=/scratch-ssd/$USER/conda_envs
-export CONDA_PKGS_DIRS=/scratch-ssd/$USER/conda_pkgs
-export XDG_CACHE_HOME=/scratch-ssd/oatml/
-export TMPDIR=/scratch-ssd/${USER}/tmp
-mkdir -p "$TMPDIR"
+COMBINED=${UTOOLCALL_COMBINED:-data/combined}
+OUT=${UTOOLCALL_UQ_OUT:-uq}
 
-REPO=~/workspace/uncertainty_tool_call
-COMBINED=${UTOOLCALL_COMBINED:-$REPO/data/combined}
-OUT=${UTOOLCALL_UQ_OUT:-$REPO/uq}
-
-# /scratch-ssd is local to each node, so create (or update) the env on this one.
-/scratch-ssd/oatml/run_locked.sh /scratch-ssd/oatml/miniconda3/bin/conda env update -f "$REPO/environment.yaml"
-source /scratch-ssd/oatml/miniconda3/bin/activate utoolcall
-
-cd "$REPO"
-pip install -e .
+command -v utoolcall >/dev/null \
+    || { echo "utoolcall not found: activate the environment where you ran pip install -e ." >&2; exit 1; }
+[ -d "$COMBINED" ] \
+    || { echo "$COMBINED not found: run utoolcall fetch-combined first" >&2; exit 1; }
 
 models="Qwen_Qwen2.5-0.5B-Instruct Qwen_Qwen2.5-3B-Instruct Qwen_Qwen2.5-7B-Instruct \
 Qwen_Qwen3-4B-Instruct-2507 google_gemma-2-9b-it google_gemma-3-12b-it \
@@ -46,8 +43,7 @@ for model in $models; do
         utoolcall uq \
             --combined_path "$COMBINED/$model" \
             --test_name "$task" \
-            --save_path "$OUT/$model" \
-            --plot_rc_figures false
+            --save_path "$OUT/$model"
     done
 done
 

@@ -8,15 +8,12 @@
                              (generate -> evaluate -> combine; needs a GPU)
 
 Run `utoolcall <command> --help` for each command's options. `uq` and `combine`
-forward unrecognised arguments to the underlying scripts, so every original
-flag still works.
+pass their arguments straight on to the `uq` and `combine` modules.
 """
 
 import argparse
 import os
 import runpy
-import shutil
-import subprocess
 import sys
 import tarfile
 import urllib.request
@@ -95,19 +92,7 @@ def cmd_fetch_combined(args, extra):
 
 def cmd_uq(args, extra):
     """Compute the uncertainty estimators for one model and one task."""
-    if extra or args.combined_path:
-        argv = list(extra)
-        if args.combined_path:
-            argv += ["--combined_path", args.combined_path]
-        if args.test_name:
-            argv += ["--test_name", args.test_name]
-        if args.save_path:
-            # uq.py writes into --save_path but does not create it.
-            Path(args.save_path).mkdir(parents=True, exist_ok=True)
-            argv += ["--save_path", args.save_path]
-        argv += ["--plot_rc_figures", str(args.plot_rc_figures).lower()]
-        return _run_module("uncertainty_tool_call.uq", argv)
-    raise SystemExit("utoolcall uq needs --combined_path and --test_name; see --help")
+    return _run_module("uncertainty_tool_call.uq", list(extra))
 
 
 def cmd_combine(args, extra):
@@ -188,14 +173,11 @@ def build_parser():
     f.add_argument("--force", action="store_true", help="re-download into a non-empty directory")
     f.set_defaults(func=cmd_fetch_combined)
 
-    u = sub.add_parser("uq", help="combined files -> AUROC score CSVs")
-    u.add_argument("--combined_path", default=None, help="directory holding combined_<task>.json")
-    u.add_argument("--test_name", default=None, help="task name, e.g. simple")
-    u.add_argument("--save_path", default=None, help="where to write the scores")
-    u.add_argument("--plot_rc_figures", default=False, help="also save risk-coverage plots")
+    # add_help=False on `uq` and `combine` so --help reaches the module, which
+    # defines the real flags.
+    u = sub.add_parser("uq", help="combined files -> AUROC score CSVs", add_help=False)
     u.set_defaults(func=cmd_uq)
 
-    # add_help=False so --help reaches combine.py, which defines the real flags.
     c = sub.add_parser("combine", help="merge greedy + sampled generations", add_help=False)
     c.set_defaults(func=cmd_combine)
 
@@ -208,7 +190,7 @@ def build_parser():
     d.add_argument("--model", default="Qwen/Qwen2.5-0.5B-Instruct")
     d.add_argument("--task", default="simple", help="BFCL test category")
     d.add_argument("--samples", type=int, default=10, help="M, high-temperature samples")
-    d.add_argument("--temperature", default="1.5", help="T, sampling temperature")
+    d.add_argument("--temperature", default="1.0", help="T, sampling temperature")
     d.set_defaults(func=cmd_prepare)
 
     return p
