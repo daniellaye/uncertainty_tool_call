@@ -137,6 +137,11 @@ utoolcall combine \
 The result lands in `combined/<model>/combined_<task>.json`, the same format as
 the step-2 download.
 
+**AST decoding.** BFCL's `evaluate` step parses each output into function calls
+(`ast_parse` in `src/uncertainty_tool_call/bfcl/model_handler/utils.py`). We
+modified it to save these parsed calls, and `utoolcall combine` stores them as
+`ast_decoded` in the combined file, where the AST-based estimators read them.
+
 ## License
 
 Apache-2.0 (see `LICENSE`). The Berkeley Function Calling Leaderboard (BFCL,
